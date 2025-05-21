@@ -1,0 +1,5 @@
+index,bill_id,bill_description,bill_reason,amount_due,customer_id,name,due_date,mobile,email,Prev_Read,Curr_Read,Consumtion
+1020102,DRB-4302052,"Water consumption bill payment of ZEMENU TADELE AWOKE, September 2017","Water consumption bill payment of ZEMENU TADELE AWOKE, September 2017",300,DRB/232323,ZEMENU TADELE AWOKE,9/27/2025,943424445,zemenutadele21@gmail.com,0,5,5
+1020103,DRB-4302053,"Water consumption bill payment of alem yitayal getahun, September 2017","Water consumption bill payment of alem yitayal getahun, September 2017",250,DRB/242424,ZEMENU TADELE AWOKE,9/28/2025,943424445,zemenutadele21@gmail.com,0,5,5
+1020104,DRB-4302054,"Water consumption bill payment of ZEMENU TADELE AWOKE, September 2017","Water consumption bill payment of ZEMENU TADELE AWOKE, September 2017",950,DRB/252525,ZEMENU TADELE AWOKE,9/29/2025,943424445,zemenutadele21@gmail.com,0,5,5
+1020105,DRB-4302055,"Water consumption bill payment of alem yitayal getahun, September 2017","Water consumption bill payment of alem yitayal getahun, September 2017",260,DRB/262626,ZEMENU TADELE AWOKE,9/30/2025,943424445,zemenutadele21@gmail.com,0,5,5

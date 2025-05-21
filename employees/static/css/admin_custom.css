@@ -1,0 +1,42 @@
+.fieldBox {
+    display: flex;
+    align-items: center; /* Align label and input on the same row */
+    width: 100%; /* Ensure it takes full available width if needed */
+    margin-bottom: 10px; /* Add some spacing between field boxes */
+    padding-left: 0px;
+    
+}
+
+.fieldBox label {
+    margin-right: 10px; /* Space between label and input */
+    white-space: nowrap; /* Prevent the label from breaking onto a new line */
+    width: 100px; /* Set a consistent width for the label */
+    text-align: right; /* Right-align the label if needed */
+    
+}
+
+.fieldBox input, .fieldBox select {
+    flex: 1; /* Let the input field grow to fill the remaining space */
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.search-container input {
+    width: 300px;
+}
+
+.action-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.action-container select {
+    width: 200px;
+}

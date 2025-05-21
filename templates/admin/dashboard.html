@@ -1,0 +1,40 @@
+<!-- admin/dashboard.html -->
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+    <h1>Admin Dashboard</h1>
+
+    <!-- Chart Container -->
+    <div style="width: 80%; margin: 0 auto;">
+        <canvas id="paymentChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('paymentChart').getContext('2d');
+        var chartData = {
+            labels: {{ chart_data.labels|safe }},
+            datasets: [{
+                label: 'Total Payments by Month',
+                data: {{ chart_data.data|safe }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        var config = {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        var paymentChart = new Chart(ctx, config);
+    </script>
+{% endblock %}

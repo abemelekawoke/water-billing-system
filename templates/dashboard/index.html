@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Durbete Water & Sewerage Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Roboto', sans-serif;
+            color: #34495e;
+        }
+
+        .container {
+            padding-top: 30px;
+            padding-bottom: 50px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 15px 25px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1.3rem;
+        }
+
+        .card-body {
+            padding: 25px;
+            background-color: #fff;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .bg-success {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .bg-danger {
+            background-color: var(--accent-color) !important;
+        }
+
+        .bg-dark {
+            background-color: var(--dark-color) !important;
+        }
+
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+
+        .data-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+
+        .infra-status {
+            margin-bottom: 15px;
+        }
+
+        .infra-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>የዱርቤቴ ከተማ ው/ፍ/አገ/ ድርጅት ሰሌዳ</h1>
+            <p>Comprehensive overview of water management system performance</p>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-primary">
+                    <p>Total Customers</p>
+                    <h3>{{total_customers}}</h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-success">
+                    <p>Water Coverage</p>
+                    <h3>98%</h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-danger">
+                    <p>Revenue</p>
+                    <h3>{{total_revenue}}</h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-dark">
+                    <p>Avg. Consum.</p>
+                    <h3>{{average_consumption}}m³</h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-warning">
+                    <p>Water Loss</p>
+                    <h3>12%</h3>
+                </div>
+            </div>
+            <div class="col-md-2 col-6">
+                <div class="stat-card bg-primary">
+                    <p>Complaints</p>
+                    <h3>42</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- First Row: Water Consumption and Sewerage -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Monthly Water Consumption (m³) - {{current_years}}
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="waterConsumptionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Sewerage Coverage by Zone
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="sewerageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row: Revenue and Water Loss -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Revenue Collection (Last 12 Months)
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Water Loss Analysis
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="waterLossChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Row: Payments and Customers -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Payment Status (Current Month)
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="paymentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Customer Distribution
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="customerChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fourth Row: Consumption and Quality -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Average Consumption per Household
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="avgConsumptionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Water Quality Metrics
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="qualityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fifth Row: Infrastructure and Complaints -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Infrastructure Status
+                    </div>
+                    <div class="card-body">
+                        <div class="infra-status">
+                            <div class="infra-label">Pipe Network Condition</div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="infra-label">Treatment Plants</div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="infra-label">Pumping Stations</div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="infraAgeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Customer Complaints
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="complaintsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const months = {{ month_labels|safe }};
+        
+        // Original metrics
+        const consumptionData = {{ consumption_datasets|safe }}
+                
+        const revenue = {
+            'Projected': [120, 125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175],
+            'Actual': [115, 123, 128, 132, 138, 142, 148, 152, 158, 162, 168, 172]
+        };
+        
+        const paymentStatus = {
+            'Paid': 68,
+            'Unpaid': 25,
+            'Overdue': 7
+        };
+        
+        const customerCounts = {
+            'North': 3250,
+            'South': 2800,
+            'East': 4120,
+            'West': 2288
+        };
+        
+        const avgConsumption = {
+            'Residential': [12, 13, 14, 15, 16, 18, 20, 19, 17, 15, 14, 13],
+            'Commercial': [25, 26, 27, 28, 29, 30, 32, 31, 30, 29, 28, 27]
+        };
+        
+        // New metrics
+        const waterLoss = {
+            'months': months,
+            'Produced': [500, 520, 510, 530, 540, 550, 560, 570, 580, 590, 600, 610],
+            'Unaccounted': [60, 65, 62, 68, 70, 72, 75, 78, 80, 82, 85, 88],
+            'Percentage': [12, 12.5, 12.2, 12.8, 13, 13.1, 13.4, 13.7, 13.8, 13.9, 14.2, 14.4]
+        };
+        
+        const waterQuality = {
+            'parameters': ['Turbidity', 'pH Level', 'Chlorine', 'Hardness', 'TDS'],
+            'values': [2.1, 7.4, 0.8, 120, 350],
+            'standards': [5.0, 8.5, 4.0, 200, 500]
+        };
+        
+        const infraAge = {
+            'types': ['Pipes', 'Valves', 'Meters', 'Pumps', 'Plants'],
+            'age': [15, 20, 5, 25, 10]
+        };
+        
+        const complaints = {
+            'types': ['Water Quality', 'Low Pressure', 'Billing', 'No Water', 'Leakage'],
+            'counts': [45, 120, 85, 60, 90],
+            'responseTime': [2.5, 1.5, 7.0, 3.0, 4.5]
+        };
+
+        // Chart configuration
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 12,
+                            family: 'Roboto'
+                        },
+                        padding: 20
+                    }
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#34495e',
+                    font: {
+                        weight: 'bold',
+                        size: 10
+                    },
+                    formatter: function(value, context) {
+                        if (context.chart.data.datasets[context.datasetIndex].label === 'Coverage (%)') {
+                            return value + '%';
+                        }
+                        if (context.chart.data.datasets[context.datasetIndex].label.includes('Revenue')) {
+                            return '$' + value + 'K';
+                        }
+                        if (context.chart.id === 'avgConsumptionChart') {
+                            return value + 'm³';
+                        }
+                        if (context.chart.id === 'waterLossChart' && context.datasetIndex === 2) {
+                            return value + '%';
+                        }
+                        return value;
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            family: 'Roboto'
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            family: 'Roboto'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Original Charts
+        // Populate the consumption values with adjusted month positions
+        
+
+        // Create the chart
+        new Chart(document.getElementById('waterConsumptionChart'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: Object.keys(consumptionData).map((key, i) => ({
+                    label: key,
+                    data: consumptionData[key],
+                    backgroundColor: [
+                        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', 
+                        '#1abc9c', '#d35400', '#34495e', '#16a085', '#c0392b'
+                    ][i % 10],
+                    borderColor: [
+                        '#2980b9', '#27ae60', '#c0392b', '#e67e22', '#8e44ad',
+                        '#16a085', '#e74c3c', '#2c3e50', '#1abc9c', '#d35400'
+                    ][i % 10],
+                    borderWidth: 1
+                }))
+            },
+            options: {
+                ...chartOptions,
+                plugins: {
+                    ...chartOptions.plugins,
+                    datalabels: {
+                        ...chartOptions.plugins.datalabels,
+                        formatter: function(value) {
+                            return value > 0 ? value.toFixed(1) : '';
+                        }
+                    }
+                },
+                scales: {
+                    ...chartOptions.scales,
+                    y: {
+                        ...chartOptions.scales.y,
+                        title: {
+                            display: true,
+                            text: 'Consumption (units)'
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById('sewerageChart'), {
+            type: 'doughnut',
+            data: {
+                labels: sewerageCoverage.map(item => item.zone),
+                datasets: [{
+                    label: 'Coverage (%)',
+                    data: sewerageCoverage.map(item => item.percent),
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#f39c12'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...chartOptions,
+                cutout: '70%',
+                plugins: {
+                    ...chartOptions.plugins,
+                    legend: {
+                        position: 'right'
+                    },
+                    datalabels: {
+                        ...chartOptions.plugins.datalabels,
+                        color: '#fff',
+                        formatter: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+        });
+
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: Object.keys(revenue).map((key, i) => ({
+                    label: key + ' Revenue',
+                    data: revenue[key],
+                    borderColor: i === 0 ? '#3498db' : '#2ecc71',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    pointBackgroundColor: i === 0 ? '#3498db' : '#2ecc71',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    tension: 0.3
+                }))
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById('paymentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(paymentStatus),
+                datasets: [{
+                    label: 'Payment Status',
+                    data: Object.values(paymentStatus),
+                    backgroundColor: ['#2ecc71', '#e74c3c', '#f39c12'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...chartOptions,
+                cutout: '70%',
+                plugins: {
+                    ...chartOptions.plugins,
+                    legend: {
+                        position: 'right'
+                    },
+                    datalabels: {
+                        ...chartOptions.plugins.datalabels,
+                        color: '#fff',
+                        formatter: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+        });
+
+        new Chart(document.getElementById('customerChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(customerCounts),
+                datasets: [{
+                    label: 'Customers',
+                    data: Object.values(customerCounts),
+                    backgroundColor: '#3498db',
+                    borderColor: '#2980b9',
+                    borderWidth: 1
+                }]
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById('avgConsumptionChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: Object.keys(avgConsumption).map((key, i) => ({
+                    label: key,
+                    data: avgConsumption[key],
+                    borderColor: ['#3498db', '#2ecc71'][i % 2],
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    pointBackgroundColor: ['#3498db', '#2ecc71'][i % 2],
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.2
+                }))
+            },
+            options: chartOptions,
+            plugins: [ChartDataLabels]
+        });
+
+        // New Charts
+        new Chart(document.getElementById('waterLossChart'), {
+            type: 'bar',
+            data: {
+                labels: waterLoss.months,
+                datasets: [
+                    {
+                        label: 'Water Produced (000 m³)',
+                        data: waterLoss.Produced,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Unaccounted Water (000 m³)',
+                        data: waterLoss.Unaccounted,
+                        backgroundColor: '#e74c3c',
+                        borderColor: '#c0392b',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Loss Percentage',
+                        data: waterLoss.Percentage,
+                        type: 'line',
+                        borderColor: '#f39c12',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                ...chartOptions,
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Volume (000 m³)'
+                        }
+                    },
+                    y1: {
+                        position: 'right',
+                        min: 0,
+                        max: 20,
+                        title: {
+                            display: true,
+                            text: 'Percentage (%)'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById('qualityChart'), {
+            type: 'radar',
+            data: {
+                labels: waterQuality.parameters,
+                datasets: [
+                    {
+                        label: 'Current Levels',
+                        data: waterQuality.values,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        pointBackgroundColor: '#3498db',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#3498db',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Quality Standards',
+                        data: waterQuality.standards,
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderColor: '#2ecc71',
+                        pointBackgroundColor: '#2ecc71',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2ecc71',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    datalabels: {
+                        display: false
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('infraAgeChart'), {
+            type: 'bar',
+            data: {
+                labels: infraAge.types,
+                datasets: [{
+                    label: 'Average Age (Years)',
+                    data: infraAge.age,
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'],
+                    borderColor: ['#2980b9', '#27ae60', '#c0392b', '#e67e22', '#8e44ad'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        new Chart(document.getElementById('complaintsChart'), {
+            type: 'bar',
+            data: {
+                labels: complaints.types,
+                datasets: [
+                    {
+                        label: 'Complaint Count',
+                        data: complaints.counts,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Avg. Response (Days)',
+                        data: complaints.responseTime,
+                        backgroundColor: '#f39c12',
+                        borderColor: '#e67e22',
+                        borderWidth: 1,
+                        type: 'line',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    datalabels: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Complaint Count'
+                        }
+                    },
+                    y1: {
+                        position: 'right',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Response Time (Days)'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+.fieldBox {
+    display: flex;
+    align-items: center; /* Align label and input on the same row */
+    width: 100%; /* Ensure it takes full available width if needed */
+    margin-bottom: 10px; /* Add some spacing between field boxes */
+    padding-left: 0px;
+    
+}
+
+.fieldBox label {
+    margin-right: 10px; /* Space between label and input */
+    white-space: nowrap; /* Prevent the label from breaking onto a new line */
+    width: 100px; /* Set a consistent width for the label */
+    text-align: right; /* Right-align the label if needed */
+    
+}
+
+.fieldBox input, .fieldBox select {
+    flex: 1; /* Let the input field grow to fill the remaining space */
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.search-container input {
+    width: 300px;
+}
+
+.action-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.action-container select {
+    width: 200px;
+}
+
+.field-School_pay_date input,
+.field-Registration input,
+.field-Tuition input,
+.field-Transport input,
+.field-Nutrition input,
+.field-Penality input,
+.field-other input,
+.field-Receipt_number input,
+.field-Bank_pay_date input {
+    width: 50px;  /* Adjust width as needed */
+    padding: 5px;  /* Optional: adds padding */
+}
+
+/* Additional style to control text input size */
+.inline-related input {
+    width: 30px; /* Adjust width to desired size */
+}
+
+/* Customize the error message appearance */
+div.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    margin-bottom: 20px;
+}

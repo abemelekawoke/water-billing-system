@@ -1,0 +1,3 @@
+index,bill_id,bill_description,bill_reason,amount_due,customer_id,name,due_date,mobile,email,Prev_Read,Curr_Read,Consumtion
+3,DRB-00111759,"Water consumption bill payment of Melsew Alebachew Ku.1, September 2017","Water consumption bill payment of Melsew Alebachew Ku.1, September 2017",90,DRB-4596,Melsew Alebachew Ku.1,4/15/2025,918127415,,0,5,5
+2,DRB-00111757,"Water consumption bill payment of Mamey Adimas, September 2017","Water consumption bill payment of Mamey Adimas, September 2017",300,DRB-4595,Mamey Adimas,4/15/2025,918448217,,0,6,6

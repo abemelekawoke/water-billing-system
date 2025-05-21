@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Water & Sewerage Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-container { width: 45%; display: inline-block; margin: 2%; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h2>Water & Sewerage Organization Dashboard</h2>
+
+  <div class="chart-container">
+    <canvas id="consumptionChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="revenueChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="sewerageChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="paymentChart"></canvas>
+  </div>
+
+  <script>
+    // Monthly Water Consumption
+    new Chart(document.getElementById('consumptionChart'), {
+      type: 'bar',
+      data: {
+        labels: {{ monthly_consumption|map(attribute='month')|list }},
+        datasets: [{
+          label: 'Consumption (m³)',
+          data: {{ monthly_consumption|map(attribute='consumption')|list }},
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        }]
+      }
+    });
+
+    // Revenue Line Chart
+    new Chart(document.getElementById('revenueChart'), {
+      type: 'line',
+      data: {
+        labels: {{ revenue|map(attribute='month')|list }},
+        datasets: [
+          {
+            label: 'Water Revenue',
+            data: {{ revenue|map(attribute='water')|list }},
+            borderColor: 'green',
+            fill: false
+          },
+          {
+            label: 'Sewerage Revenue',
+            data: {{ revenue|map(attribute='sewerage')|list }},
+            borderColor: 'orange',
+            fill: false
+          }
+        ]
+      }
+    });
+
+    // Sewerage Coverage Pie Chart
+    new Chart(document.getElementById('sewerageChart'), {
+      type: 'pie',
+      data: {
+        labels: {{ sewerage_coverage|map(attribute='zone')|list }},
+        datasets: [{
+          label: 'Coverage %',
+          data: {{ sewerage_coverage|map(attribute='percent')|list }},
+          backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384']
+        }]
+      }
+    });
+
+    // Payment Status
+    new Chart(document.getElementById('paymentChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Paid', 'Unpaid', 'Partial'],
+        datasets: [{
+          label: 'Payments',
+          data: [{{ payment_status.paid }}, {{ payment_status.unpaid }}, {{ payment_status.partial }}],
+          backgroundColor: ['#4caf50', '#f44336', '#ff9800']
+        }]
+      }
+    });
+  </script>
+
+</body>
+</html>
